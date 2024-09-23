@@ -1,4 +1,6 @@
-﻿namespace CourseEnrollmentSystem
+﻿using System.Text;
+
+namespace CourseEnrollmentSystem
 {
     internal class Program
     {
@@ -12,24 +14,77 @@
         static void MainMenu()
         {
             AddNewCourse();
+            StringBuilder sb = new StringBuilder();
+            foreach (string Key in CoursesDictionary.Keys)
+            {
+                sb.Append(Key);
+            }
+            Console.WriteLine("Courses: " + sb.ToString());
+            RemoveCourse();
+            sb.Clear();
+            foreach (string Key in CoursesDictionary.Keys)
+            {
+                sb.Append(Key);
+            }
+            Console.WriteLine("Courses: " + sb.ToString());
         }
 
         static void AddNewCourse()
         {
-            string CourseCode;
-            while (string.IsNullOrEmpty(CourseCode = Console.ReadLine()) || CoursesDictionary.ContainsKey(CourseCode))
+            do
             {
-                if (CoursesDictionary.ContainsKey(CourseCode))
+                string CourseCode;
+                Console.WriteLine("\nEnter the new course ID, or type \"x\" to exit:\n");
+                while (string.IsNullOrEmpty(CourseCode = Console.ReadLine().ToLower().Trim()) || CoursesDictionary.ContainsKey(CourseCode.ToLower().Trim()) || (CourseCode == "x"))
                 {
-                    Console.WriteLine("\nCourse already exists, please try again:\n");
+                    if(CourseCode == "x")
+                    {
+                        return;
+                    }
+                    Console.Clear();
+                    if (CoursesDictionary.ContainsKey(CourseCode))
+                    {
+                        Console.WriteLine("\nCourse already exists, please try again.\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nInvalid course ID, please try again.\n");
+                    }
+                    Console.WriteLine("\nEnter the new course ID:\n");
                 }
-                else
-                {
-                    Console.WriteLine("\nInvalid course ID, please try again:\n");
-                }
-            }
+                CoursesDictionary.Add(CourseCode, null);
+            } while (true);
+        }
 
-            CoursesDictionary.Add(CourseCode, null);
+        static void RemoveCourse()
+        {
+            do
+            {
+                string CourseToRemove;
+                Console.WriteLine("\nEnter the course ID to remove, or type \"x\" to exit:\n");
+                while (string.IsNullOrEmpty(CourseToRemove = Console.ReadLine().ToLower().Trim()) || !CoursesDictionary.ContainsKey(CourseToRemove.ToLower().Trim()) || (!CoursesDictionary.TryGetValue(CourseToRemove, out HashSet<string>? strings)) || (CourseToRemove == "x"))
+                {
+                    Console.Clear();
+                    if (CourseToRemove == "x")
+                    {
+                        return;
+                    }
+                    else if (!CoursesDictionary.ContainsKey(CourseToRemove))
+                    {
+                        Console.WriteLine("\nCourse does not exist, please try again.\n");
+                    }
+                    else if (string.IsNullOrEmpty(CourseToRemove.ToLower().Trim()))
+                    {
+                        Console.WriteLine("\nInvalid course ID, please try again.\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nCourse has enrolled students, please try again.\n");
+                    }
+                    Console.WriteLine("\nEnter the course ID to remove, or type \"x\" to exit:\n");
+                }
+                CoursesDictionary.Remove(CourseToRemove);
+            } while(true);
         }
     }
 }
