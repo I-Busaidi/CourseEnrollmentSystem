@@ -102,8 +102,8 @@ namespace CourseEnrollmentSystem
                 string CourseCode;
                 DisplayStudentsInAllCourses();
                 Console.WriteLine("\nEnter the new course ID, or type \"x\" to exit:\n");
-                while (string.IsNullOrEmpty(CourseCode = Console.ReadLine().ToLower().Trim()) 
-                    || CoursesDictionary.ContainsKey(CourseCode.ToLower().Trim()) 
+                while (string.IsNullOrEmpty(CourseCode = Console.ReadLine().ToUpper()) 
+                    || CoursesDictionary.ContainsKey(CourseCode) 
                     || (CourseCode == "x"))
                 {
                     if(CourseCode == "x")
@@ -123,7 +123,7 @@ namespace CourseEnrollmentSystem
                 }
                 Console.Clear();
                 Console.WriteLine($"Enter the number of seats available for {CourseCode} (1 to 30):\n");
-                while ((!int.TryParse(Console.ReadLine(), out CourseSeatNumber))||(CourseSeatNumber < 1) ||(CourseSeatNumber > 30))
+                while ((!int.TryParse(Console.ReadLine(), out CourseSeatNumber)) || (CourseSeatNumber < 1) || (CourseSeatNumber > 30))
                 {
                     Console.Clear();
                     Console.WriteLine($"Enter the number of seats available for {CourseCode} (1 to 30):\n");
@@ -150,13 +150,13 @@ namespace CourseEnrollmentSystem
                 DisplayStudentsInAllCourses();
                 string CourseToRemove;
                 Console.WriteLine("\nEnter the course ID to remove, or type \"x\" to exit:\n");
-                while (string.IsNullOrEmpty(CourseToRemove = Console.ReadLine().ToLower().Trim()) 
-                    || (!CoursesDictionary.ContainsKey(CourseToRemove.ToLower().Trim()))
+                while (string.IsNullOrEmpty(CourseToRemove = Console.ReadLine().ToUpper()) 
+                    || (!CoursesDictionary.ContainsKey(CourseToRemove.ToUpper()))
                     || (CoursesDictionary[CourseToRemove].Count > 0) 
-                    || (CourseToRemove == "x"))
+                    || (CourseToRemove == "X"))
                 {
                     Console.Clear();
-                    if (CourseToRemove == "x")
+                    if (CourseToRemove == "X")
                     {
                         return;
                     }
@@ -213,23 +213,28 @@ namespace CourseEnrollmentSystem
                 {
                     DisplayStudentsInAllCourses();
                     Console.WriteLine("Enter the student name to enroll, or \"x\" to exit:\n");
-                    string EnrollStudentName;
-                    while (string.IsNullOrEmpty(EnrollStudentName = Console.ReadLine()))
+                    string EnteredName;
+                    while (string.IsNullOrEmpty(EnteredName = Console.ReadLine().ToLower()))
                     {
                         Console.Clear();
                         Console.WriteLine("\nInvalid name, please try again.");
                         Console.WriteLine("Enter the student name to enroll:\n");
                     }
-                    if (EnrollStudentName == "x")
+                    if (EnteredName == "x")
                     {
                         return;
                     }
+                    string EnrollStudentName = NameFormatting(EnteredName);
                     Console.WriteLine("\nEnter the course ID to enroll student in, or \"x\" to exit:\n");
                     string EnrollCourse;
-                    while (string.IsNullOrEmpty(EnrollCourse = Console.ReadLine())
+                    while (string.IsNullOrEmpty(EnrollCourse = Console.ReadLine().ToUpper())
                         || (!CoursesDictionary.ContainsKey(EnrollCourse))
                         || (CoursesDictionary[EnrollCourse].Count >= CourseSeats[EnrollCourse]))
                     {
+                        if (EnrollCourse == "X")
+                        {
+                            return;
+                        }
                         Console.Clear();
                         if (!CoursesDictionary.ContainsKey(EnrollCourse))
                         {
@@ -290,23 +295,23 @@ namespace CourseEnrollmentSystem
             {
                 Console.Clear();
                 DisplayStudentsInAllCourses();
-
-
                 Console.WriteLine("Enter the student name to be removed from a course or \"x\" to exit:\n");
-                string RemoveStudentName;
-                while (string.IsNullOrEmpty(RemoveStudentName = Console.ReadLine()))
+                string EnteredName;
+                while (string.IsNullOrEmpty(EnteredName = Console.ReadLine().ToLower()))
                 {
                     Console.Clear();
                     Console.WriteLine("\nInvalid name, please try again.");
                     Console.WriteLine("Enter the student name to be removed from a course or \"x\" to exit:\n");
                 }
-                if (RemoveStudentName == "x")
+                if (EnteredName == "x")
                 {
                     return;
                 }
+                
+                string RemoveStudentName = NameFormatting(EnteredName);
                 Console.WriteLine("\nEnter the course ID to remove the student from:\n");
                 string RemoveFromCourse;
-                while (string.IsNullOrEmpty(RemoveFromCourse = Console.ReadLine()) 
+                while (string.IsNullOrEmpty(RemoveFromCourse = Console.ReadLine().ToUpper()) 
                     || (!CoursesDictionary.ContainsKey(RemoveFromCourse)))
                 {
                     Console.Clear();
@@ -334,6 +339,7 @@ namespace CourseEnrollmentSystem
                             if (WaitList[i].CourseName == RemoveFromCourse)
                             {
                                 EnrollStudent(WaitList[i].StudentName, WaitList[i].CourseName);
+                                WaitList.RemoveAt(i);
                                 break;
                             }
                         }
@@ -355,7 +361,7 @@ namespace CourseEnrollmentSystem
             DisplayStudentsInAllCourses();
             Console.WriteLine("Enter the course ID to view enrolled students, or enter \"x\" to exit:\n");
             string CourseToView;
-            while ((string.IsNullOrEmpty(CourseToView = Console.ReadLine())) 
+            while ((string.IsNullOrEmpty(CourseToView = Console.ReadLine().ToUpper())) 
                 || (!CoursesDictionary.ContainsKey(CourseToView)) 
                 || (CoursesDictionary[CourseToView].Count <= 0))
             {
@@ -418,7 +424,7 @@ namespace CourseEnrollmentSystem
             string FirstCourse;
             string SecondCourse;
             Console.Write("Course 1: ");
-            while((string.IsNullOrEmpty(FirstCourse = Console.ReadLine())) 
+            while((string.IsNullOrEmpty(FirstCourse = Console.ReadLine().ToUpper())) 
                 || (!CoursesDictionary.ContainsKey(FirstCourse)) 
                 || (CoursesDictionary[FirstCourse].Count <= 0))
             {
@@ -442,8 +448,9 @@ namespace CourseEnrollmentSystem
                 Console.WriteLine("Enter two courses IDs to check common students, or enter \"x\" to exit:\n");
             }
             Console.Clear();
+            DisplayStudentsInAllCourses();
             Console.Write("Course 2: ");
-            while ((string.IsNullOrEmpty(SecondCourse = Console.ReadLine())) 
+            while ((string.IsNullOrEmpty(SecondCourse = Console.ReadLine().ToUpper())) 
                 || (!CoursesDictionary.ContainsKey(SecondCourse)) 
                 || (CoursesDictionary[SecondCourse].Count <= 0))
             {
@@ -516,6 +523,15 @@ namespace CourseEnrollmentSystem
             foreach (var Kvp in CoursesDictionary)
             {
                 CoursesDictionary[Kvp.Key].Remove(StudentNameToRemove);
+                for (int i = 0; i < WaitList.Count; i++)
+                {
+                    if (WaitList[i].CourseName == Kvp.Key)
+                    {
+                        EnrollStudent(WaitList[i].StudentName, WaitList[i].CourseName);
+                        WaitList.RemoveAt(i);
+                        break;
+                    }
+                }
             }
             Console.WriteLine($"\nStudent {StudentNameToRemove} removed successfuly.");
         }
@@ -554,6 +570,53 @@ namespace CourseEnrollmentSystem
             WaitList.Add(("ENG303", "Eva"));    // Eva waiting for ENG303
 
             Console.WriteLine("Startup data initialized.");
+        }
+
+        static string NameFormatting(string Input)
+        {
+            bool FirstCharSpace = false;
+            StringBuilder FormattedName = new StringBuilder();
+            for (int i = 0; i < Input.Length; i++)
+            {
+                if (Input[i].ToString() == " ")
+                {
+                    if (i == 0)
+                    {
+                        FirstCharSpace = true;
+                    }
+                    for (int j = i + 1; j < Input.Length; j++)
+                    {
+                        if (Input[j].ToString() == " ")
+                        {
+                            Input.Remove(j);
+                            i++;
+                        }
+                        else
+                        {
+                            if (!FirstCharSpace)
+                            {
+                                FormattedName.Append(" ");
+                            }
+                            break;
+                        }
+                    }
+                    if((i+1) < Input.Length)
+                    {
+                        FormattedName.Append(Input[i + 1].ToString().ToUpper());
+                        i++;
+                    }
+                    
+                }
+                else if (i == 0)
+                {
+                    FormattedName.Append(Input[i].ToString().ToUpper());
+                }
+                else
+                {
+                    FormattedName.Append(Input[i].ToString().ToLower());
+                }
+            }
+            return FormattedName.ToString();
         }
     }
 }
